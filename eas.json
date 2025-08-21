@@ -1,13 +1,14 @@
 {
   "cli": {
     "version": ">= 16.17.4",
-    "appVersionSource": "remote"
+    "appVersionSource": "remote",
+     "packageManager": "yarn"
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-       "packageManager": "yarn"
+      "distribution": "internal"
+      
     },
     "preview": {
       "distribution": "internal"
