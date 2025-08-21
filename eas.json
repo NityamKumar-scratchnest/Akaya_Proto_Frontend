@@ -1,8 +1,8 @@
 {
   "cli": {
     "version": ">= 16.17.4",
-    "appVersionSource": "remote",
-     "packageManager": "yarn"
+    "appVersionSource": "remote"
+    
   },
   "build": {
     "development": {
