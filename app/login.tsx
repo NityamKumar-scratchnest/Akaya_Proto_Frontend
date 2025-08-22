@@ -58,9 +58,9 @@ export default function LoginScreen() {
       <View style={styles.card}>
         {/* <Package size={48} color="#1E66F9" style={styles.logoIcon} /> */}
         <Text style={styles.appName}>Acaya</Text>
-        <Text style={styles.subtitle}>
+        {/* <Text style={styles.subtitle}>
           Sign in to manage your smart containers
-        </Text>
+        </Text> */}
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -131,6 +131,7 @@ const styles = StyleSheet.create({
     }),
   },
   appName: {
+    color : "#000",
     fontSize: 26,
     fontWeight: "700",
     marginBottom: 8,

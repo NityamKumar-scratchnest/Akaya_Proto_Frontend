@@ -8,13 +8,15 @@
     "scheme": "akaya",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
+    
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "userInterfaceStyle": "light" 
       },
       "edgeToEdgeEnabled": true,
       "package": "com.nityammishra.akayaProto"

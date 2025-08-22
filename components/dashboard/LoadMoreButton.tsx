@@ -15,38 +15,49 @@ export default function LoadButtons({
 }) {
   return (
     <View style={styles.container}>
-      {hasPrev && (
-        <TouchableOpacity style={styles.button} onPress={onPrev} disabled={loading}>
-          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.text}>Prev</Text>}
-        </TouchableOpacity>
-      )}
+      {/* Previous Button */}
+      <TouchableOpacity
+        style={[styles.button, !hasPrev && styles.buttonDisabled]} // Apply disabled style if no previous
+        onPress={onPrev}
+        disabled={loading || !hasPrev} // Disable if loading or no previous page
+      >
+        {loading && !hasPrev ? <ActivityIndicator color="#000" /> : <Text style={styles.text}>Prev</Text>}
+      </TouchableOpacity>
 
-      {hasNext && (
-        <TouchableOpacity style={styles.button} onPress={onNext} disabled={loading}>
-          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.text}>Next</Text>}
-        </TouchableOpacity>
-      )}
+      {/* Next Button */}
+      <TouchableOpacity
+        style={[styles.button, !hasNext && styles.buttonDisabled]} // Apply disabled style if no next
+        onPress={onNext}
+        disabled={loading || !hasNext} // Disable if loading or no next page
+      >
+        {loading && !hasNext ? <ActivityIndicator color="#000" /> : <Text style={styles.text}>Next</Text>}
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
+    flexDirection: "row", // ✨ Key change: Ensure buttons are arranged horizontally
     justifyContent: "center",
-    marginVertical: 20,
-    marginHorizontal: 100,
+    // Removed marginHorizontal as parent will control spacing
   },
   button: {
-    backgroundColor: "#1E66F9",
+    backgroundColor: "#F5F5F5", // Changed to gray-100
     paddingVertical: 6,
     paddingHorizontal: 20,
     borderRadius: 8,
     alignItems: "center",
-    marginHorizontal: 5,
+    marginHorizontal: 5, // Keep some spacing between buttons
+    borderWidth: 1, // Add a subtle border
+    borderColor: '#E0E0E0', // Light gray border
+  },
+  buttonDisabled: {
+    opacity: 0.5, // Make disabled buttons look faded
+    backgroundColor: '#F9F9F9', // Slightly lighter background when disabled
   },
   text: {
-    color: "#fff",
+    color: "#333", // Changed text color for better contrast
     fontSize: 14,
     fontWeight: "400",
   },

@@ -1,41 +1,73 @@
 // src/api/devicesApi.ts
 import axios from "axios";
 
-const baseURL = "https://akayaprotobackend.onrender.com";
+const baseURL = "https://akayaprotobackend.onrender.com"; // Ensure this matches your local server
 
-export interface FetchDevicesParams {
-  accessToken: string;
-  limit?: number;
-  cursor?: string | null;
-  prevCursor?: string | null;
-  search?: string;
+// Define the structure of a single device as expected from the API
+export interface ApiDevice {
+  _id: string;
+  name: string;
+  status: string;
+  isLocked: boolean;
+  temperature: number;
+  humidity: number;
+  batteryLevel: number;
+  firmwareVersion: string;
+  model: string;
+  location: {
+    lat: number;
+    lng: number;
+    address: string;
+  };
+  lastUpdate: string;
+  createdAt: string; // Add createdAt as it's used for sorting on backend
+  updatedAt: string; // Add updatedAt if your mongoose schema includes timestamps
+  payload: string; // Add payload as it's a key identifier for devices
+  secretKey: string; // Add secretKey if it's part of the device model (might be sensitive)
 }
 
+// Define the structure of the paginated API response for devices
+export interface PaginatedDevicesResponse {
+  data: ApiDevice[];
+  currentPage: number;
+  totalPages: number;
+  totalRecords: number;
+}
+
+// Update the parameters interface for fetching devices
+export interface FetchDevicesParams {
+  accessToken: string;
+  page?: number;      // New: for page-based pagination
+  limit?: number;     // New: for page-based pagination
+  search?: string;
+  // Removed: cursor and prevCursor as we're switching to page-based pagination
+  // cursor?: string | null;
+  // prevCursor?: string | null;
+}
+
+// Update fetchDevicesApi to use page-based pagination
 export const fetchDevicesApi = async ({
   accessToken,
-  limit = 30,
-  cursor,
-  prevCursor,
+  page = 1,        // Default page to 1
+  limit = 20,      // Default limit to 20 (can match ITEMS_PER_PAGE from frontend)
   search = "",
-}: FetchDevicesParams) => {
-  const res = await axios.get(`${baseURL}/api/devices`, {
+}: FetchDevicesParams): Promise<PaginatedDevicesResponse> => {
+  const res = await axios.get<PaginatedDevicesResponse>(`${baseURL}/api/devices`, {
     params: {
-      limit,
+      page,        // Pass page number
+      limit,       // Pass limit per page
       q: search,
-      cursor: cursor || undefined,
-      prevCursor: prevCursor || undefined,
     },
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
 
-  // API returns { data, nextCursor, prevCursor }
+  // The API now directly returns { data, currentPage, totalPages, totalRecords }
   return res.data;
 };
 
-
-// Fetch device by ID
+// Fetch device by ID (no changes needed for this specific function)
 export const fetchDeviceByIdApi = async ({
   accessToken,
   deviceId,
@@ -51,7 +83,7 @@ export const fetchDeviceByIdApi = async ({
   return res.data;
 };
 
-// Add a new device
+// Add a new device (no changes needed for this specific function)
 export const addDeviceApi = async ({
   accessToken,
   deviceData,
@@ -59,7 +91,8 @@ export const addDeviceApi = async ({
   accessToken: string;
   deviceData: Record<string, any>;
 }) => {
-  const res = await axios.post(`${baseURL}/api/devices`, deviceData, {
+  // Assuming your backend's /api/devices post endpoint is /api/devices/add
+  const res = await axios.post(`${baseURL}/api/devices/add`, deviceData, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -67,6 +100,6 @@ export const addDeviceApi = async ({
   return res.data;
 };
 
-export const fetchSensorLogsApi = async ()=>{
+export const fetchSensorLogsApi = async () => {
   return null
 }

@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { fetchDevicesApi } from "../../services/devicesApi";
-import { addDeviceApi } from "../../services/devicesApi";
+// Ensure correct import path, assuming devicesApi.ts is in ../../services/
+import { addDeviceApi, ApiDevice, fetchDevicesApi, PaginatedDevicesResponse } from "../../services/devicesApi";
+
 // --- Interfaces ---
 export interface Location {
   lat: number;
@@ -8,8 +9,9 @@ export interface Location {
   address: string;
 }
 
+// Client-side Device interface (should align with what your UI expects)
 export interface Device {
-  id: string;
+  id: string; // Maps to _id from backend
   name: string;
   status: string;
   isLocked: boolean;
@@ -20,15 +22,18 @@ export interface Device {
   model: string;
   location: Location;
   lastUpdate: string;
+  payload?: string; // Add payload as it's useful to have
 }
 
+// Updated DeviceState to include pagination metadata
 interface DeviceState {
   devices: Device[];
   selectedDevice: Device | null;
   loading: boolean;
   error: string | null;
-  nextCursor: string | null;
-  prevCursor: string | null;
+  currentPage: number;   // New
+  totalPages: number;    // New
+  totalRecords: number;  // New
 }
 
 // --- Initial State ---
@@ -37,12 +42,14 @@ const initialState: DeviceState = {
   selectedDevice: null,
   loading: false,
   error: null,
-  nextCursor: null,
-  prevCursor: null,
+  currentPage: 1,      // Initialize for pagination
+  totalPages: 1,       // Initialize for pagination
+  totalRecords: 0,     // Initialize for pagination
 };
 
 // --- Helper Mapper ---
-const mapApiDevice = (item: any): Device => ({
+// This function maps the backend's ApiDevice structure to your frontend's Device structure
+const mapApiDevice = (item: ApiDevice): Device => ({
   id: item._id,
   name: item.name,
   status: item.status,
@@ -53,24 +60,24 @@ const mapApiDevice = (item: any): Device => ({
   firmwareVersion: item.firmwareVersion ?? "",
   model: item.model ?? "",
   location: item.location ?? { lat: 0, lng: 0, address: "" },
-  lastUpdate: item.lastUpdate ?? "",
+  lastUpdate: item.lastUpdate ?? "", // Ensure lastUpdate is mapped correctly from your backend field
+  payload: item.payload, // Include payload
 });
 
 // --- Thunks ---
+// fetchDevices now accepts `page` and `limit`
 export const fetchDevices = createAsyncThunk(
   "devices/fetchDevices",
   async (
     {
       accessToken,
-      limit,
-      cursor,
-      prevCursor,
+      page, // Accept page number
+      limit, // Accept limit per page
       search,
     }: {
-      accessToken: string | null;   // ✅ allow null here
+      accessToken: string | null;
+      page?: number;
       limit?: number;
-      cursor?: string | null;
-      prevCursor?: string | null;
       search?: string;
     },
     { rejectWithValue }
@@ -80,28 +87,23 @@ export const fetchDevices = createAsyncThunk(
     }
 
     try {
-      const res = await fetchDevicesApi({
+      // Call the updated API service with page and limit
+      const res: PaginatedDevicesResponse = await fetchDevicesApi({
         accessToken,
+        page,
         limit,
-        cursor,
-        prevCursor,
         search,
       });
 
-      return {
-        devices: res.data.map(mapApiDevice),
-        nextCursor: res.nextCursor || null,
-        prevCursor: res.prevCursor || null,
-      };
+      // Return the full paginated response directly
+      return res; // The payload will be PaginatedDevicesResponse
     } catch (err: any) {
       return rejectWithValue(err.response?.data || err.message);
     }
   }
 );
 
-
-// Add Device 
-
+// Add Device (no changes needed)
 export const addDevice = createAsyncThunk(
   "devices/addDevice",
   async (
@@ -119,9 +121,7 @@ export const addDevice = createAsyncThunk(
     }
     try {
       const res = await addDeviceApi({ accessToken, deviceData });
-      // res is whatever addDeviceApi returns (it returns res.data).
-      // Map to your Device shape:
-      const created = (res && (res.data ?? res)) as any;
+      const created = (res && (res.device ?? res)) as any; // Backend returns { message, device } or just device
       return mapApiDevice(created);
     } catch (err: any) {
       return rejectWithValue(err.response?.data || err.message);
@@ -129,19 +129,18 @@ export const addDevice = createAsyncThunk(
   }
 );
 
-
-
-
 // --- Slice ---
 const devicesSlice = createSlice({
   name: "devices",
   initialState,
   reducers: {
+    // Reset devices reducer now also resets pagination metadata
     resetDevices: (state) => {
       state.devices = [];
-      state.nextCursor = null;
-      state.prevCursor = null;
       state.selectedDevice = null;
+      state.currentPage = 1;
+      state.totalPages = 1;
+      state.totalRecords = 0;
     },
     setSelectedDevice: (state, action: PayloadAction<string>) => {
       state.selectedDevice =
@@ -170,34 +169,44 @@ const devicesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-    .addCase(addDevice.pending, (state) => {
-  state.loading = true;
-  state.error = null;
-})
-.addCase(addDevice.fulfilled, (state, action) => {
-  state.loading = false;
-  // Prepend the newly created device to the list
-  state.devices.unshift(action.payload);
-})
-.addCase(addDevice.rejected, (state, action) => {
-  state.loading = false;
-  state.error = action.payload as string;
-})
+      .addCase(addDevice.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addDevice.fulfilled, (state, action) => {
+        state.loading = false;
+        // Prepend the newly created device to the list
+        state.devices.unshift(action.payload);
+        // If adding a device, totalRecords might increase
+        state.totalRecords += 1;
+        // Re-calculate total pages, assuming ITEMS_PER_PAGE from frontend for simplicity
+        // In a complex app, you might re-fetch the first page to get accurate pagination info
+        state.totalPages = Math.ceil(state.totalRecords / (initialState.devices.length > 0 ? initialState.devices.length : 20)); // Use a default ITEMS_PER_PAGE if devices array is empty
+        state.currentPage = 1; // Go back to the first page when adding a new device
+      })
+      .addCase(addDevice.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
       .addCase(fetchDevices.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchDevices.fulfilled, (state, action) => {
+      .addCase(fetchDevices.fulfilled, (state, action: PayloadAction<PaginatedDevicesResponse>) => {
         state.loading = false;
-        state.devices = action.payload.devices;
-        state.nextCursor = action.payload.nextCursor;
-        state.prevCursor = action.payload.prevCursor;
+        state.devices = action.payload.data.map(mapApiDevice); // Map raw API data to frontend Device interface
+        state.currentPage = action.payload.currentPage;
+        state.totalPages = action.payload.totalPages;
+        state.totalRecords = action.payload.totalRecords;
       })
       .addCase(fetchDevices.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+        state.devices = []; // Clear devices on error
+        state.currentPage = 1;
+        state.totalPages = 1;
+        state.totalRecords = 0;
       });
-      
   },
 });
 

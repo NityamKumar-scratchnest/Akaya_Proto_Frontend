@@ -11,21 +11,19 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import AddDeviceModal from "../components/AddDeviceModal";
-import LoadButtons from "../components/dashboard/LoadMoreButton";
 import DeviceGrid from "../components/DeviceGrid";
 import Navbar from "../components/Navbar";
 import SearchBar from "../components/SearchBar";
 import { fetchDevices } from "../redux/slices/devicesSlice";
 import { AppDispatch, RootState } from "../redux/store";
-import Footer from "../components/Footer";
 export default function Dashboard() {
   const [modalVisible, setModalVisible] = useState(false);
   const { width } = useWindowDimensions();
 
   const dispatch = useDispatch<AppDispatch>();
-  const { devices, loading, nextCursor, prevCursor } = useSelector(
-    (state: RootState) => state.devices
-  );
+  // const { devices, loading, nextCursor, prevCursor } = useSelector(
+  //   (state: RootState) => state.devices
+  // );
   const accessToken = useSelector( (state : RootState) => state.auth.accessToken )
   console.log(accessToken)
 
@@ -115,7 +113,7 @@ export default function Dashboard() {
         <DeviceGrid />
 
         {/* Pagination buttons */}
-        <LoadButtons
+        {/* <LoadButtons
           onNext={() =>
             dispatch(fetchDevices({ accessToken, cursor: nextCursor }))
           }
@@ -125,7 +123,7 @@ export default function Dashboard() {
           loading={loading}
           hasNext={!!nextCursor}
           hasPrev={!!prevCursor}
-        />
+        /> */}
 
         
       </ScrollView>
