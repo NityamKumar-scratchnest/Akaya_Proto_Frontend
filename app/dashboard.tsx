@@ -179,14 +179,14 @@ const styles = StyleSheet.create({
   styleOnFirst:{
     backgroundColor : '#fff',
     
-    paddingBottom : 10,
+    // paddingBottom : 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.07,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
     shadowRadius: 5,
 
     // These properties control the stacking order
-    elevation: 5, // For Android shadow and stacking
+    elevation: 3, // For Android shadow and stacking
     zIndex: 1,
   },
   btnText: {

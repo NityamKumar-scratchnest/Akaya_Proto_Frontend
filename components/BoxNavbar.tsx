@@ -28,6 +28,7 @@ export default function BoxNavbar({ title }: BoxNavbarProps) {
           paddingVertical: isSmallScreen ? 20 : 20,
           marginTop : isSmallScreen ? 0 : 0,
           paddingHorizontal: isSmallScreen ? 30 : 160,
+          paddingTop : isSmallScreen ? 40 : 20
         },
       ]}
     >
@@ -58,6 +59,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#e0e0e0',
     width: '100%',
+   
   },
   backButton: {
     flexDirection: 'row',

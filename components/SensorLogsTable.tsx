@@ -173,7 +173,8 @@ export default function SensorLogsTable() {
       {/* Header section with title and export button */}
       <View style={styles.header}>
         <Text style={styles.title}>All Sensor Data Logs</Text>
-        <TouchableOpacity style={[styles.exportButton, { marginLeft: isSmallScreen ? 15 : 2, padding: isSmallScreen ? 2 : 10 }]} onPress={exportToCSV}>
+        <TouchableOpacity style={[styles.exportButton, { marginRight: isSmallScreen ? 10 : 2, padding: isSmallScreen ? 2 : 10 }]} onPress={exportToCSV}>
+
           <Ionicons name="download" size={16} color="#fff" />
           <Text style={styles.exportButtonText}>Export CSV</Text>
         </TouchableOpacity>
@@ -286,7 +287,8 @@ const getStyles = (isSmallScreen: boolean) => StyleSheet.create({
     backgroundColor: '#007bff',
     borderRadius: 8,
     paddingVertical: 10,
-    paddingHorizontal: 15
+    paddingHorizontal: 15,
+    marginRight : 5
   },
   exportButtonText: {
     color: '#fff',

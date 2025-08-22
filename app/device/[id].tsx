@@ -56,14 +56,14 @@ const styles = StyleSheet.create({
   shadowBottomContainer:{
    
     
-      paddingBottom : 0,
-      shadowColor: '#f8f3f3ff',
-      shadowOffset: { width: 0, height: 0 },
-      shadowOpacity: 0.04,
-      shadowRadius: 5,
+    //  paddingBottom : 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.07,
+    shadowRadius: 5,
 
     // These properties control the stacking order
-    elevation: 2, // For Android shadow and stacking
+    elevation: 5, // For Android shadow and stacking
     zIndex: 1,
   },
   notFound: {

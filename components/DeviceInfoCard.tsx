@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E0E0E0',
     marginBottom: 12,
-    margin : 10,
+    // margin : 10,
     height : 200
   },
   kvRow: {

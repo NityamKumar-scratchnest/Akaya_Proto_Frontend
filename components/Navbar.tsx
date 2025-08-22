@@ -26,7 +26,7 @@ export default function Navbar() {
           marginBottom: 0,
           paddingVertical: isSmallScreen ? 10 : 10,
           paddingHorizontal: isSmallScreen ? 30 : 135,
-          paddingTop : isSmallScreen ? 25 : 20,
+          paddingTop : isSmallScreen ? 30 : 20,
         },
       ]}
     >

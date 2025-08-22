@@ -21,7 +21,7 @@ const isLargeScreen = width > 720
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    // backgroundColor: '#F9FAFB',
     padding: 0,
   },
   notFoundContainer: {
