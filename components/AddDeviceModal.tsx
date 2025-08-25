@@ -148,7 +148,7 @@ picker: {
   color: '#333', // text color to match TextInput
   ...Platform.select({
     web: {
-      outline: 'none',
+      // outline: 'none',
       borderWidth: 0,   // remove browser default borders
       backgroundColor: 'transparent',
     },

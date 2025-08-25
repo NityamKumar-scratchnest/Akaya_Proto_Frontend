@@ -37,9 +37,10 @@ export default function SearchBar() {
       style={[
         styles.container,
         {
-          width: isLargeScreen ? '83%' : isTablet ? '80%' : '96%',
+          width: isLargeScreen ? '86%' : isTablet ? '100%' : '100%',
           alignSelf: 'center',
-          paddingLeft : isLargeScreen ? 0 : 5
+          paddingLeft : isLargeScreen ? 6 : 3,
+          paddingRight : isLargeScreen ? 18 : 2
         },
       ]}
     >

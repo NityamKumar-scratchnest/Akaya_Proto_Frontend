@@ -10,7 +10,7 @@ import { fetchDevices, setSelectedDevice } from '../redux/slices/devicesSlice';
 import { AppDispatch, RootState } from '../redux/store';
 import LoadButtons from './dashboard/LoadMoreButton'; // Import LoadButtons
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 21;
 
 const DeviceCard = ({ device }: { device: Device }) => {
   const dispatch = useDispatch();
@@ -155,13 +155,16 @@ export default function DeviceGrid() {
     );
   }
 
-  if (error) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>Error: {error}</Text>
-      </View>
-    );
-  }
+ if (error) {
+  return (
+    <View style={styles.centered}>
+      <Text style={styles.errorText}>
+        Error: {typeof error === "string" ? error : error || JSON.stringify(error)}
+      </Text>
+    </View>
+  );
+}
+
 
   if (devices.length === 0 && !loading) {
     return (
@@ -174,7 +177,7 @@ export default function DeviceGrid() {
   return (
     <View style={styles.container}>
       {isLargeScreen ? (
-        <View style={[styles.grid, { paddingHorizontal: 94, paddingRight: 100 }]}>
+        <View style={[styles.grid, { paddingHorizontal: 104, paddingRight: 119 }]}>
           {devices.map(device => (
             <View key={device.id} style={[styles.gridItem, { padding: isLargeScreen ? 6 : 6 }]}>
               <DeviceCard device={device} />
@@ -361,7 +364,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     borderTopWidth: 1,
     borderColor: '#f0f0f0',
-    paddingHorizontal: 105,
+    paddingHorizontal: 112,
     flexWrap: 'wrap',
   },
   // Small screen specific styles for the main pagination container

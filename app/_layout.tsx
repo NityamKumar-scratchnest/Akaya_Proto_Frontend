@@ -6,27 +6,31 @@ import store, { persistor } from '../redux/store';
 // Ensure this path is absolutely correct and the file exists at this location.
 import { fetchDevices, } from '../redux/slices/devicesSlice';
 import type { AppDispatch } from '../redux/store';
+import { refreshAccessToken } from '../services/authApi';
+import { setAccessToken } from '../redux/slices/authSlice';
 
 // Create a new component to house the Redux logic
 function AppContent() {
   const dispatch = useDispatch<AppDispatch>();
 
-  useEffect(() => {
-    const fetchAllData = async () => {
-      // console.log('Fetching latest device and sensor log data...');
-      // These calls should now correctly resolve to functions after cache clear
-      dispatch(fetchDevices({} as any)); 
-    };
+ useEffect(() => {
+  const interval = setInterval(async () => {
+    try {
+      const state = store.getState().auth;
+      if (state.refreshToken) {
+        console.log("⏳ Trying proactive refresh...");
+        const { accessToken: newToken } = await refreshAccessToken(state.refreshToken);
+        store.dispatch(setAccessToken(newToken));
+        console.log("✅ Token refreshed proactively");
+      }
+    } catch (err) {
+      console.error("Proactive refresh failed", err);
+    }
+  }, 10 * 60 * 1000); // every 10 minutes
 
-    // Fetch data immediately when the app mounts
-    fetchAllData();
-
-    // Set up an interval to fetch data periodically (every 10 minutes)
-    const intervalId = setInterval(fetchAllData, 600000); // 10 minutes = 600000 ms
-
-    // Cleanup function: Clear the interval when the component unmounts
-    return () => clearInterval(intervalId);
-  }, [dispatch]); // Dependency array includes dispatch
+  return () => clearInterval(interval);
+}, []);
+ // Dependency array includes dispatch
 
   // Render the rest of your app's content here
   return <Stack screenOptions={{ headerShown: false }} />;
@@ -36,7 +40,7 @@ export default function RootLayout() {
   return (
     <Provider store={store}>
       <PersistGate
-       
+        loading={null}
         persistor={persistor}
       >
         {/* Render AppContent as a child of PersistGate (and thus Provider) */}

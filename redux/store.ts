@@ -28,7 +28,7 @@ if (Platform.OS === 'web') {
 const persistConfig = {
   key: 'root',
   storage: persistStorage,
-  whitelist: ['devices'],
+  whitelist: ['auth', 'devices'],
 };
 
 const rootReducer = combineReducers({

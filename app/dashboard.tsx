@@ -9,6 +9,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import AddDeviceModal from "../components/AddDeviceModal";
 import DeviceGrid from "../components/DeviceGrid";
@@ -16,21 +17,24 @@ import Navbar from "../components/Navbar";
 import SearchBar from "../components/SearchBar";
 import { fetchDevices } from "../redux/slices/devicesSlice";
 import { AppDispatch, RootState } from "../redux/store";
+
+// system-wide spacing scale
+const spacing = {
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+};
+
 export default function Dashboard() {
   const [modalVisible, setModalVisible] = useState(false);
   const { width } = useWindowDimensions();
-
   const dispatch = useDispatch<AppDispatch>();
-  // const { devices, loading, nextCursor, prevCursor } = useSelector(
-  //   (state: RootState) => state.devices
-  // );
-  const accessToken = useSelector( (state : RootState) => state.auth.accessToken )
-  console.log(accessToken)
 
-  // Replace this with your actual token (from auth state or secure store)
-  // const accessToken = "YOUR_ACCESS_TOKEN";
+  const accessToken = useSelector(
+    (state: RootState) => state.auth.accessToken
+  );
 
-  // Initial load
   useEffect(() => {
     dispatch(fetchDevices({ accessToken, limit: 30, search: "Boxes" }));
   }, [dispatch]);
@@ -38,108 +42,70 @@ export default function Dashboard() {
   const isLargeScreen = width >= 768;
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <Navbar />
 
       {/* Header Row */}
-      <View style={styles.styleOnFirst}>
-      <View
-        style={[
-          styles.headerRow,
-          {
-            paddingHorizontal: isLargeScreen ? 35 : 10,
-            paddingTop: isLargeScreen ? 20 : 5,
-          },
-        ]}
-      >
-        <View style={{ paddingLeft: isLargeScreen ? 10 : 5 }}>
-          <Text
-            style={[
-              styles.header,
-              {
-                fontSize: isLargeScreen ? 26 : 22,
-                paddingHorizontal: isLargeScreen ? 90 : 3,
-                paddingTop: 12,
-              },
-            ]}
-          >
-            Device Dashboard
-          </Text>
-          <Text
-            style={[
-              styles.sub,
-              {
-                fontSize: isLargeScreen ? 16 : 12,
-                paddingHorizontal: isLargeScreen ? 90 : 3,
-                paddingTop : 4
-              },
-            ]}
-          >
-            Manage your smart boxes
-          </Text>
-        </View>
-        <Pressable
-          style={[
-            styles.button,
-            {
-              marginHorizontal: isLargeScreen ? 102 : 0,
-              paddingHorizontal: isLargeScreen ? 18 : 6,
-              paddingVertical: isLargeScreen ? 9 : 8,
-              marginRight : isLargeScreen ? 110 : 10 ,
-            },
-          ]}
-          onPress={() => setModalVisible(true)}
-        >
-          <Plus stroke="#fff" fill="#fff" size={16}/>
-          <Text style={styles.btnText}>Add Device</Text>
-        </Pressable>
-      </View>
-      <SearchBar />
-      </View>
+      <View style={styles.headerWrapper}>
+        <View style={[styles.headerRow , { paddingHorizontal : isLargeScreen ? 110 : 2} ]}>
+          <View>
+            <Text
+              style={[
+                styles.header,
+                { fontSize: isLargeScreen ? 26 : 22 },
+              ]}
+            >
+              Device Dashboard
+            </Text>
+            <Text
+              style={[
+                styles.sub,
+                { fontSize: isLargeScreen ? 16 : 12 },
+              ]}
+            >
+              Manage your smart boxes
+            </Text>
+          </View>
 
-      
+          <Pressable
+            style={[
+              styles.button,
+              {
+                paddingHorizontal: isLargeScreen ? spacing.sm : spacing.sm,
+                paddingVertical: isLargeScreen ? 10 : 8,
+                marginRight : isLargeScreen ? 10 : 0,
+              },
+            ]}
+            onPress={() => setModalVisible(true)}
+          >
+            <Plus stroke="#fff" fill="#fff" size={16} />
+            <Text style={styles.btnText}>Add Device</Text>
+          </Pressable>
+        </View>
+
+        <SearchBar />
+      </View>
 
       {/* Scrollable Device Grid */}
       <ScrollView
         contentContainerStyle={[
           styles.scrollContainer,
           {
-            paddingHorizontal: isLargeScreen ? 38 : 0,
-            paddingVertical: isLargeScreen ? 30 : 15,
+            paddingHorizontal: isLargeScreen ? spacing.lg : spacing.md,
+            paddingVertical: isLargeScreen ? spacing.lg : spacing.md,
           },
         ]}
         showsVerticalScrollIndicator={false}
       >
         <DeviceGrid />
-
-        {/* Pagination buttons */}
-        {/* <LoadButtons
-          onNext={() =>
-            dispatch(fetchDevices({ accessToken, cursor: nextCursor }))
-          }
-          onPrev={() =>
-            dispatch(fetchDevices({ accessToken, prevCursor }))
-          }
-          loading={loading}
-          hasNext={!!nextCursor}
-          hasPrev={!!prevCursor}
-        /> */}
-
-        
       </ScrollView>
-      
 
       {/* Add Device Modal */}
       <AddDeviceModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
       />
-
-      {/* <ScrollView>
-        <Footer/>
-      </ScrollView> */}
-      
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -147,52 +113,47 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F9FAFB",
-    
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingBottom: 20,
+    paddingBottom: spacing.lg,
+  },
+  headerWrapper: {
+    backgroundColor: "#fff",
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 3,
+    zIndex: 1,
   },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
-    
+    marginBottom: spacing.md,
   },
   header: {
     fontWeight: "700",
-    fontSize: 0,
-    color : "#212529"
-    // fontFamily: "mono",
+    color: "#212529",
   },
   sub: {
     color: "#666",
+    marginTop: 4,
   },
   button: {
     backgroundColor: "#2563eb",
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 5,
-    gap: 2,
-  },
-  styleOnFirst:{
-    backgroundColor : '#fff',
-    
-    // paddingBottom : 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-
-    // These properties control the stacking order
-    elevation: 3, // For Android shadow and stacking
-    zIndex: 1,
+    borderRadius: 6,
+    gap: 6,
   },
   btnText: {
     color: "#fff",
     fontWeight: "500",
-    fontSize : 16,
+    fontSize: 16,
     marginLeft: 4,
   },
 });

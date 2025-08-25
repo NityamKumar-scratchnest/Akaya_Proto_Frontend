@@ -49,7 +49,7 @@ export default function DeviceDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-   
+   backgroundColor: '#F9FAFB',
 
    
   },
@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 0,
+    
   },
   section: {
     marginTop: 20,
