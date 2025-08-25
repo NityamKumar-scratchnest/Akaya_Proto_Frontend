@@ -21,7 +21,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "build:web": "expo export:web"
+    "build:web": "npx expo export:web"
   },
   "dependencies": {
     "@apollo/client": "^3.13.9",
